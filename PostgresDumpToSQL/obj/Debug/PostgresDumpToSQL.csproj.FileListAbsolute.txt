@@ -1,0 +1,10 @@
+C:\Users\Engineer1\source\repos\PostgresDumpToSQL\PostgresDumpToSQL\bin\Debug\PostgresDumpToSQL.exe.config
+C:\Users\Engineer1\source\repos\PostgresDumpToSQL\PostgresDumpToSQL\bin\Debug\PostgresDumpToSQL.exe
+C:\Users\Engineer1\source\repos\PostgresDumpToSQL\PostgresDumpToSQL\bin\Debug\PostgresDumpToSQL.pdb
+C:\Users\Engineer1\source\repos\PostgresDumpToSQL\PostgresDumpToSQL\obj\Debug\PostgresDumpToSQL.csprojAssemblyReference.cache
+C:\Users\Engineer1\source\repos\PostgresDumpToSQL\PostgresDumpToSQL\obj\Debug\PostgresDumpToSQL.Form1.resources
+C:\Users\Engineer1\source\repos\PostgresDumpToSQL\PostgresDumpToSQL\obj\Debug\PostgresDumpToSQL.Properties.Resources.resources
+C:\Users\Engineer1\source\repos\PostgresDumpToSQL\PostgresDumpToSQL\obj\Debug\PostgresDumpToSQL.csproj.GenerateResource.cache
+C:\Users\Engineer1\source\repos\PostgresDumpToSQL\PostgresDumpToSQL\obj\Debug\PostgresDumpToSQL.csproj.CoreCompileInputs.cache
+C:\Users\Engineer1\source\repos\PostgresDumpToSQL\PostgresDumpToSQL\obj\Debug\PostgresDumpToSQL.exe
+C:\Users\Engineer1\source\repos\PostgresDumpToSQL\PostgresDumpToSQL\obj\Debug\PostgresDumpToSQL.pdb
