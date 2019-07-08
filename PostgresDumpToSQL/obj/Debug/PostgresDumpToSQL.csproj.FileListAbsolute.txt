@@ -8,3 +8,13 @@ C:\Users\Engineer1\source\repos\PostgresDumpToSQL\PostgresDumpToSQL\obj\Debug\Po
 C:\Users\Engineer1\source\repos\PostgresDumpToSQL\PostgresDumpToSQL\obj\Debug\PostgresDumpToSQL.csproj.CoreCompileInputs.cache
 C:\Users\Engineer1\source\repos\PostgresDumpToSQL\PostgresDumpToSQL\obj\Debug\PostgresDumpToSQL.exe
 C:\Users\Engineer1\source\repos\PostgresDumpToSQL\PostgresDumpToSQL\obj\Debug\PostgresDumpToSQL.pdb
+E:\Bobs Proj\PostgresDumpToSQL2\PostgresDumpToSQL\bin\Debug\PostgresDumpToSQL.exe.config
+E:\Bobs Proj\PostgresDumpToSQL2\PostgresDumpToSQL\bin\Debug\PostgresDumpToSQL.exe
+E:\Bobs Proj\PostgresDumpToSQL2\PostgresDumpToSQL\bin\Debug\PostgresDumpToSQL.pdb
+E:\Bobs Proj\PostgresDumpToSQL2\PostgresDumpToSQL\obj\Debug\PostgresDumpToSQL.csprojAssemblyReference.cache
+E:\Bobs Proj\PostgresDumpToSQL2\PostgresDumpToSQL\obj\Debug\PostgresDumpToSQL.Form1.resources
+E:\Bobs Proj\PostgresDumpToSQL2\PostgresDumpToSQL\obj\Debug\PostgresDumpToSQL.Properties.Resources.resources
+E:\Bobs Proj\PostgresDumpToSQL2\PostgresDumpToSQL\obj\Debug\PostgresDumpToSQL.csproj.GenerateResource.cache
+E:\Bobs Proj\PostgresDumpToSQL2\PostgresDumpToSQL\obj\Debug\PostgresDumpToSQL.csproj.CoreCompileInputs.cache
+E:\Bobs Proj\PostgresDumpToSQL2\PostgresDumpToSQL\obj\Debug\PostgresDumpToSQL.exe
+E:\Bobs Proj\PostgresDumpToSQL2\PostgresDumpToSQL\obj\Debug\PostgresDumpToSQL.pdb

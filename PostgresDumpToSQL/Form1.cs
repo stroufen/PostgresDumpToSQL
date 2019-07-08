@@ -8,18 +8,34 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace PostgresDumpToSQL
 {
     public partial class Form1 : Form
     {
-        private string insertedDumpFile;
+
+        class Config
+        {
+            public List<String> functions { get; set; } = new List<String>();
+            //public string functionItem { get; set; }
+            public List<String> views { get; set; } = new List<String>();
+            public List<String> types { get; set; } = new List<String>();
+        }
+
+        Config config = new Config();
+        bool DB_isLoaded = false;
+        bool Config_isLoaded = false;
+
+        private string InsertedDumpFile { get; set; }
+
+
         public Form1()
         {
             InitializeComponent();
         }
 
-        private void panel1_DragEnter(object sender, DragEventArgs e)
+        private void OpenFileDragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
@@ -27,30 +43,94 @@ namespace PostgresDumpToSQL
             }
         }
 
-        private void panel1_DragDrop(object sender, DragEventArgs e)
+        private void DB_OpenFileDragDrop(object sender, DragEventArgs e)
         {
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-            foreach (string file in files)
-                Process(file);
-        }
 
-        private void panel2_DragEnter(object sender, DragEventArgs e)
-        {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            if(files.Length == 1)
             {
-                e.Effect = DragDropEffects.Copy;
+                open_db_dump_btn.Text = $"{Path.GetFileName(files[0])}";
+                DB_isLoaded = true;
+
+
             }
+
+            if(DB_isLoaded == true && Config_isLoaded == true)
+            {
+                Process(files[0]);
+                run_btn.Enabled = true;
+            }
+            
         }
 
-        private void panel2_DragDrop(object sender, DragEventArgs e)
+
+        private void Config_OpenFileDragDrop(object sender, DragEventArgs e)
         {
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-            foreach (string file in files)
-                Process(file);
+
+            if (files.Length == 1)
+            {
+                ConfigProcess(files[0]);
+                open_config_file_btn.Text = $"{Path.GetFileName(files[0])}";
+                Config_isLoaded = true;
+                open_db_dump_btn.Enabled = true;
+
+            }
+
+            if (DB_isLoaded == true && Config_isLoaded == true)
+            {
+                run_btn.Enabled = true;
+            }
+
         }
 
 
+        void ConfigProcess(string path)
+        {
 
+            string[] config_Content = File.ReadAllLines(path);
+            int functionIndex = Array.FindIndex(config_Content, x => x.Equals("[Functions]"));
+
+            //for tables, .contains("[Schema]"); or "Data"
+            int viewIndex = Array.FindIndex(config_Content, x => x.Equals("[Views]"));
+            int typeIndex = Array.FindIndex(config_Content, x => x.Equals("[Types]"));
+            int endIndex = Array.FindIndex(config_Content, x => x.Equals("[END]"));
+
+            for (int i = functionIndex + 1, length = viewIndex == -1 ? config_Content.Length : viewIndex; i < length; ++i)
+            {
+                string configContent = config_Content[i];
+                if (!string.IsNullOrEmpty(configContent) && !string.IsNullOrWhiteSpace(configContent))
+                {
+                    config.functions.Add(configContent);
+                }
+            }
+
+            for (int i = viewIndex + 1, length = typeIndex == -1 ? config_Content.Length : typeIndex; i < length; ++i)
+            {
+                string configContent = config_Content[i];
+                if (!string.IsNullOrEmpty(configContent) && !string.IsNullOrWhiteSpace(configContent))
+                {
+                    config.views.Add(configContent);
+                }
+            }
+
+            for (int i = typeIndex + 1, length = endIndex == -1 ? config_Content.Length : endIndex; i < length; ++i)
+            {
+                string configContent = config_Content[i];
+                if (!string.IsNullOrEmpty(configContent) && !string.IsNullOrWhiteSpace(configContent))
+                {
+                    config.types.Add(configContent);
+                }
+            }
+
+
+
+            //string functionItem = string.Join("\n", config.functions.Select(f => create_Block_FunctionItem(f)));
+
+            //config.functionItem = functionItem;
+
+        }
+        
 
         void Process(string path)
         {
@@ -65,7 +145,7 @@ namespace PostgresDumpToSQL
             File.WriteAllText("newFileTest.sql", content.Trim('-'));
             var contentAgain = string.Join(",", commaDilimited);
 
-            set_DumpFile(content);
+            InsertedDumpFile = content;
             //             string attribute_ViewItem_0 = @"vw_all_800xa_tags_ch";
             //             string attribute_ViewItem_1 = @"vw_all_dfi2_ch";
             //             string attribute_ViewItem_2 = @"vw_all_euds_ch";
@@ -78,33 +158,36 @@ namespace PostgresDumpToSQL
             //                 + create_Block_ViewItem(attribute_ViewItem_2) + "\n"
             //                 + create_Block_ViewItem(attribute_ViewItem_3) + "\n"
             //                 + create_Block_ViewItem(attribute_ViewItem_4) + "\n";
-            string viewItem = "";
+            //string viewItem = "";
 
 
 
 
-                         string attribute_FunctionItem_0 = @"fn_add_800xa_recs_td_ch(p_do_log boolean)";
-                         string attribute_FunctionItem_1 = @"fn_add_or_update_800xa_tags_ch(p_tags harmonydata.type_800xa_tag_ch[], p_mode text, p_do_update_alm_inh boolean)";
-                         string attribute_FunctionItem_2 = @"fn_add_or_update_splus_tags_ch(";
-                         //string attribute_FunctionItem_3 = @"vw_all_tags_ch";
-                         //string attribute_FunctionItem_4 = @"vw_all_tfi_ch";
-             
-             
-                         string functionItem = create_Block_FunctionItem(attribute_FunctionItem_0) + "\n"
-                             + create_Block_FunctionItem(attribute_FunctionItem_1) + "\n"
-                             + create_Block_FunctionItem(attribute_FunctionItem_2) + "\n";
+                         //string attribute_FunctionItem_0 = @"fn_add_800xa_recs_td_ch(p_do_log boolean)";
+                         //string attribute_FunctionItem_1 = @"fn_add_or_update_800xa_tags_ch(p_tags harmonydata.type_800xa_tag_ch[], p_mode text, p_do_update_alm_inh boolean)";
+                         //string attribute_FunctionItem_2 = @"fn_add_or_update_splus_tags_ch(p_tags harmonydata.type_tag_ch[], p_mode text, p_do_add_default_800xa_recs boolean)";
 
-            CreateNewSQLFile(viewItem, functionItem);
+
+            string functionItem = string.Join("\n", config.functions.Select(f => create_Block_FunctionItem(f)));
+            string viewItem = string.Join("\n", config.views.Select(f => create_Block_ViewItem(f)));
+            string typeItem = string.Join("\n", config.types.Select(f => create_Block_TypeItem(f)));
+
+
+            //string interpolation = $"Hello { Environment.NewLine }"; // Hello \n // use $@ for literal interpolation
+
+            //string functionItem = "";
+
+            CreateNewSQLFile(viewItem, functionItem, typeItem);
 
         }
 
         // if IDOK (user has selected types,views, functions, etc. to use in new file),
         // create new file and write to it the top and bottom hard-coded features
-        void CreateNewSQLFile(string viewItem, string functionItem)
+        void CreateNewSQLFile(string viewItem, string functionItem, string typeItem)
         {
-            
+            //using(var save = new SaveFileDialog())
 
-            string newFile_Path = @"C:\Users\Engineer1\Desktop\testNew.sql";
+            string newFile_Path = @"C:\Users\straw\Desktop\testNew.sql";
             
             //add starting boiler plate code
             if (!File.Exists(newFile_Path))
@@ -120,8 +203,10 @@ namespace PostgresDumpToSQL
 
                     //
                     //processView(upgradedSQL, "vw_all_euds_ch");
-                    //upgradedSQL.WriteLine(viewItem);
                     upgradedSQL.WriteLine(functionItem);
+                    upgradedSQL.WriteLine(viewItem);
+                    upgradedSQL.WriteLine(typeItem);
+
 
 
                     // ending boiler plate code
@@ -149,6 +234,8 @@ namespace PostgresDumpToSQL
             //add methods to process each type that needs to be obtained (4 total)
         }
 
+
+
         public string create_Block_ViewItem(string selectedViewItem)
         {
             var sentences = new List<String>();
@@ -156,18 +243,15 @@ namespace PostgresDumpToSQL
             string startingPosition = @"CREATE VIEW harmonydata." + selectedViewItem;
             //string selectedViewItem2 = @"ALTER TABLE harmonydata.vw_all_euds_ch OWNER TO postgres;";
 
-            int index1 = get_DumpFile().IndexOf(startingPosition);
-            int index2 = get_DumpFile().IndexOf(startingPosition);
-
-            //MessageBox.Show("index 1: " + index1.ToString());
-            //MessageBox.Show("index 2: " + index2.ToString());
+            int index1 = InsertedDumpFile.IndexOf(startingPosition);
+            int index2 = InsertedDumpFile.IndexOf(startingPosition);
 
             do
             {
-                index2 = get_DumpFile().IndexOf(';', index1);
+                index2 = InsertedDumpFile.IndexOf(';', index1);
                 if (index2 >= 0)
                 {
-                    sentences.Add(get_DumpFile().Substring(index1, index2 - index1 + 1).Trim('-'));
+                    sentences.Add(InsertedDumpFile.Substring(index1, index2 - index1 + 1).Trim('-'));
                     index1 = index2 + 1;
                 }
             } while (index2 > 0);
@@ -197,6 +281,57 @@ namespace PostgresDumpToSQL
         }
 
 
+        public string create_Block_TypeItem(string selectedTypeItem)
+        {
+            var sentences = new List<String>();
+
+            string startingPosition = @"CREATE TYPE harmonydata." + selectedTypeItem;
+            string endingPosition = @"ALTER TYPE harmonydata." + selectedTypeItem + @" OWNER TO postgres;";
+
+            int index1 = InsertedDumpFile.IndexOf(startingPosition);
+            int index2 = InsertedDumpFile.IndexOf(startingPosition);
+        
+            do
+            {
+                index2 = InsertedDumpFile.IndexOf(';', index1);
+                if (index2 >= 0)
+                {
+                    sentences.Add(InsertedDumpFile.Substring(index1, index2 - index1 + 1).Trim('-'));
+                    index1 = index2 + 1;
+                }
+            } while (index2 > 0);
+
+            foreach (var sentence in sentences)
+            {
+                Console.WriteLine(sentence);
+            }
+
+            string sentenceBuild = "";
+            for (int i = 0; i < sentences.Count(); i++)
+            {
+                if (!(sentences.ElementAt(i).ToString().TrimStart()).Equals(endingPosition))
+                {
+                    do
+                    {
+                        sentenceBuild += sentences.ElementAt(i);
+
+                    } while (sentences.ElementAt(i).StartsWith(endingPosition));
+                }
+                else
+                {
+                    sentenceBuild += sentences.ElementAt(i);
+                    break;
+                }
+
+
+            }
+
+            string sentenceBuilt = sentenceBuild;
+
+            //sentenceBuilt = Regex.Replace(sentenceBuilt, @"^(.*;)\s*--.*", "$1");
+            return sentenceBuilt;
+        }
+
         public string create_Block_FunctionItem(string selectedFunctionItem)
         {
             var sentences = new List<String>();
@@ -206,18 +341,18 @@ namespace PostgresDumpToSQL
             string endingPosition = @"ALTER FUNCTION harmonydata." + selectedFunctionItem + @" OWNER TO postgres;";
             //string selectedViewItem2 = @"ALTER TABLE harmonydata.vw_all_euds_ch OWNER TO postgres;";
 
-            int index1 = get_DumpFile().IndexOf(startingPosition);
-            int index2 = get_DumpFile().IndexOf(startingPosition);
+            int index1 = InsertedDumpFile.IndexOf(startingPosition);
+            int index2 = InsertedDumpFile.IndexOf(startingPosition);
 
             //MessageBox.Show("index 1: " + index1.ToString());
             //MessageBox.Show("index 2: " + index2.ToString());
 
             do
             {
-                index2 = get_DumpFile().IndexOf(';', index1);
+                index2 = InsertedDumpFile.IndexOf(';', index1);
                 if (index2 >= 0)
                 {
-                    sentences.Add(get_DumpFile().Substring(index1, index2 - index1 + 1).Trim('-'));
+                    sentences.Add(InsertedDumpFile.Substring(index1, index2 - index1 + 1).Trim('-'));
                     index1 = index2 + 1;
                 }
             } while (index2 > 0);
@@ -229,7 +364,7 @@ namespace PostgresDumpToSQL
 
             // need to concatencate all sentences up to last sentence that contains ALTER FUNCTION
             string sentenceBuild = "";
-            for(int i = 0; i < sentences.Count() - 1; i++)
+            for(int i = 0; i < sentences.Count(); i++)
             {
                 if (!(sentences.ElementAt(i).ToString().TrimStart()).Equals(endingPosition))
                 {
@@ -260,19 +395,10 @@ namespace PostgresDumpToSQL
 
             sentenceBuilt = sentenceBuilt.Insert(viewInsertIndex, viewUpdateFormat);
 
+            sentenceBuilt = Regex.Replace(sentenceBuilt, @"/\*(.|\n)*?\*/", "");
             return sentenceBuilt;
         }
 
-
-        private void set_DumpFile(string dumpFile)
-        {
-            insertedDumpFile = dumpFile;
-        }
-
-        private string get_DumpFile()
-        {
-            return insertedDumpFile;
-        }
         
 
 
